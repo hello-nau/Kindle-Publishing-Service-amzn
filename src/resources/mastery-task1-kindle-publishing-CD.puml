@@ -277,6 +277,17 @@ class PublishingStatusRecord {
          + build(): PublishingStatusRecord
 }
 
+class BookNotFoundException {
+    + serialVersionUID: long
+    {method} + BookNotFoundException(message: String)
+    {method} + BookNotFoundException(message: String, cause: Throwable)
+}
+
+class PublishingStatusNotFoundException {
+    + serialVersionUID: long
+    {method} + PublishingStatusNotFoundException(message: String)
+    {method} + PublishingStatusNotFoundException(message: String, cause: Throwable)
+}
 
 GetBookActivity --|> RecommendationsServiceClient
 GetBookActivity --|> CatalogDao
@@ -298,5 +309,7 @@ Book --|> GetPublishingStatusResponse
 BookRecommendation --|> Book
 PublishingStatusRecord --|> Book
 PublishingStatusRecord --|> PublishingStatus
+RuntimeException <|-- BookNotFoundException
+RuntimeException <|-- PublishingStatusNotFoundException
 
 @enduml
