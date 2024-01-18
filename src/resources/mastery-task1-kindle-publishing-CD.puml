@@ -139,6 +139,144 @@ class GetBookResponse.Builder
     + build() : GetBookResponse
 
 }
+class GetPublishingStatusResponse {
+    - publishingStatusHistory: List<PublishingStatusRecord>
+
+    + GetPublishingStatusResponse(publishingStatusHistory: List<PublishingStatusRecord>)
+    + getPublishingStatusHistory(): List<PublishingStatusRecord>
+    + setPublishingStatusHistory(publishingStatusHistory: List<PublishingStatusRecord>): void
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + GetPublishingStatusResponse(builder: Builder)
+    + builder(): Builder
+    class GetPublishingStatusResponse.Builder {
+    - publishingStatusHistory: List<PublishingStatusRecord>
+
+    + withPublishingStatusHistory(publishingStatusHistoryToUse: List<PublishingStatusRecord>): Builder
+    + build(): GetPublishingStatusResponse
+}
+
+class RemoveBookFromCatalogResponse {
++ RemoveBookFromCatalogResponse()
+}
+class SubmitBookForPublishingResponse {
+    - publishingRecordId: String
+
+    + SubmitBookForPublishingResponse(publishingRecordId: String)
+    + getPublishingRecordId(): String
+    + setPublishingRecordId(publishingRecordId: String): void
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + builder(): Builder
+    class SubmitBookForPublishingResponse.Builder {
+    - publishingRecordId: String
+
+    + withPublishingRecordId(publishingRecordIdToUse: String): Builder
+    + build(): SubmitBookForPublishingResponse
+}
+
+class Book {
+    - bookId: String
+    - title: String
+    - author: String
+    - text: String
+    - genre: String
+    - version: int
+
+     + getBookId(): String
+     + setBookId(bookId: String): void
+     + getTitle(): String
+     + setTitle(title: String): void
+     + getAuthor(): String
+     + setAuthor(author: String): void
+     + getText(): String
+     + setText(text: String): void
+     + getGenre(): String
+     + setGenre(genre: String): void
+     + getVersion(): int
+     + setVersion(version: int): void
+    + Book(bookId: String, title: String, author: String, text: String, genre: String, version: int)
+    + equals(o: Object): boolean
+    + hashCode(): int
+    + builder(): Builder
+    class Book.Builder {
+        - bookId: String
+        - title: String
+        - author: String
+        - text: String
+        - genre: String
+        - version: int
+
+         + withBookId(bookIdToUse: String): Builder
+         + withTitle(titleToUse: String): Builder
+         + withAuthor(authorToUse: String): Builder
+         + withText(textToUse: String): Builder
+         + withGenre(genreToUse: String): Builder
+         + withVersion(versionToUse: int): Builder
+         + build(): Book
+}
+
+class BookRecommendation {
+    - title: String
+    - author: String
+    - asin: String
+
+     + BookRecommendation(title: String, author: String, asin: String)
+     + getTitle(): String
+     + setTitle(title: String): void
+     + getAuthor(): String
+     + setAuthor(author: String): void
+     + getAsin(): String
+     + setAsin(asin: String): void
+     + equals(o: Object): boolean
+     + hashCode(): int
+     + BookRecommendation(builder: Builder)
+    + builder(): Builder
+
+    class BookRecommendation.Builder {
+        - title: String
+        - author: String
+        - asin: String
+
+         + withTitle(titleToUse: String): Builder
+         + withAuthor(authorToUse: String): Builder
+         + withAsin(asinToUse: String): Builder
+         + build(): BookRecommendation
+}
+
+class PublishingStatus {
+    +QUEUED: String
+    +IN_PROGRESS: String
+    +FAILED: String
+    +SUCCESSFUL: String
+}
+class PublishingStatusRecord {
+    - status: String
+    - statusMessage: String
+    - bookId: String
+
+     + PublishingStatusRecord(status: String, statusMessage: String, bookId: String)
+     + getStatus(): String
+     + setStatus(status: String): void
+     + getStatusMessage(): String
+     + setStatusMessage(statusMessage: String): void
+     + getBookId(): String
+     + setBookId(bookId: String): void
+     + equals(o: Object): boolean
+     + hashCode(): int
+     + PublishingStatusRecord(builder: Builder)
+    + builder(): Builder
+    class PublishingStatusRecord.Builder {
+        - status: String
+        - statusMessage: String
+        - bookId: String
+
+         + withStatus(statusToUse: String): Builder
+         + withStatusMessage(statusMessageToUse: String): Builder
+         + withBookId(bookIdToUse: String): Builder
+         + build(): PublishingStatusRecord
+}
+
 
 GetBookActivity --|> RecommendationsServiceClient
 GetBookActivity --|> CatalogDao
@@ -154,4 +292,11 @@ GetPublishingStatusRequest --|> GetPublishingStatusRequest.Builder
 RemoveBookFromCatalogRequest --|> RemoveBookFromCatalogRequest.Builder
 SubmitBookForPublishingRequest --|> SubmitBookForPublishingRequest.Builder
 GetBookResponse --|> GetBookResponse.Builder
+GetPublishingStatusResponse --|> GetPublishingStatusResponse.Builder
+GetPublishingStatusResponse --|> PublishingStatusRecord
+Book --|> GetPublishingStatusResponse
+BookRecommendation --|> Book
+PublishingStatusRecord --|> Book
+PublishingStatusRecord --|> PublishingStatus
+
 @enduml
