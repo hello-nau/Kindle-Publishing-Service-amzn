@@ -1,1 +1,157 @@
 PARTICIPANTS: use this file for creating the class diagram in mastery task 01
+@startuml
+class getBookActivity {
+ - recommendationServiceClient: RecommendationsServiceClient
+ - catalogDao: CatalogDao
+ + GetBookActivity(catalogDao: CatalogDao,
+ recommendationServiceClient: RecommendationsServiceClient)
+ + execute(request: GetBookRequest): GetBookResponse
+}
+
+class GetPublishingStatusActivity {
++ execute (publishingStatusRequest : GetPublishingStatusRequest) : GetPublishingStatusResponse
+}
+
+class RemoveBookFromCatalogActivity {
++ execute(removeBookFromCatalogRequest : RemoveBookFromCatalogRequest) : RemoveBookFromCatalogResponse
+}
+
+class SubmitBookForPublishingActivity {
+- publishingStatusDao : PublishingStatusDao
++ execute(request : SubmitBookForPublishingRequest) : SubmitBookForPublishingResponse
+}
+
+class RecommendationsServiceClient {
+- recommendationsService : RecommendationsService
++ getBookRecommendations(genre : BookGenre) : List<BookRecommendation>
+}
+
+class CatalogDao {
+- dynamoDBMapper : DynamoDBMapper
++ getBookFromCatalog(bookId : String) : CatalogItemVersion
+- getLatestVersionOfBook(bookId : String) : CatalogItemVersion
+}
+
+class PublishingStatusDao {
+- ADDITIONAL_NOTES_PREFIX : String
+- dynamoDBMapper : DynamoDBMapper
++ setPublishingStatus(publishingRecordId : String, publishingRecordStatus : PublishingRecordStatus,
+                      bookId : String) : PublishingStatusItem
++ setPublishingStatus(publishingRecordId : String, publishingRecordStatus : PublishingRecordStatus,
+                                           bookId : String, message : String) : PublishingStatusItem
+
+}
+class GetBookRequest {
+- bookId : String
++ getBookId() : String
++ setBookId(bookId : String) : void
++ GetBookRequest()
++ GetBookRequest (builder : Builder)
++ equals(o: Object): boolean
++ hashCode(): int
++ builder(): Builder
+class GetBookRequest.Builder {
+    - bookId: String
+
+    + withBookId(bookIdToUse: String): Builder
+    + build(): GetBookRequest}
+}
+
+class GetPublishingStatusRequest {
+- publishingRecordId : String
++ GetPublishingStatusRequest(publishingRecordId : String)
++ getPublishingRecordId() : String
++ setPublishingRecordId(publishingRecordId : String) : void
++ equals(o: Object): boolean
++ hashCode(): int
++ GetPublishingStatusRequest(builder : Builder)
+class GetPublishingStatusRequest.Builder {
+    - publishingRecordId : String
+    + withPublishingRecordId(publishingRecordId : String) : Builder
+    + build() : GetPublishingStatusRequest
+}
+
+class RemoveBookFromCatalogRequest {
+- bookId : String
++ RemoveBookFromCatalogRequest()
++ getBookId() : String
++ setBookId (bookId : String) : void
++ equals(o: Object): boolean
++ hashCode(): int
++ RemoveBookFromCatalogRequest(builder : Builder)
+class RemoveBookFromCatalogRequest.Builder {
+    - bookId : String
+    + withBookId (bookId : String)
+    + build() : RemoveBookFromCatalogRequest
+}
+
+class SubmitBookForPublishingRequest {
+    - bookId: String
+    - title: String
+    - author: String
+    - text: String
+    - genre: String
+
+     + SubmitBookForPublishingRequest(bookId: String, title: String, author: String, text: String, genre: String)
+     + getBookId(): String
+     + setBookId(bookId: String): void
+     + getTitle(): String
+     + setTitle(title: String): void
+     + getAuthor(): String
+     + setAuthor(author: String): void
+     + getText(): String
+     + setText(text: String): void
+     + getGenre(): String
+     + setGenre(genre: String): void
+     + equals(o: Object): boolean
+     + hashCode(): int
+     + SubmitBookForPublishingRequest(builder: Builder)
+    + builder(): Builder
+class SubmitBookForPublishingRequest.Builder
+    - bookId: String
+    - title: String
+    - author: String
+    - text: String
+    - genre: String
+
+     + withBookId(bookIdToUse: String): Builder
+     + withTitle(titleToUse: String): Builder
+     + withAuthor(authorToUse: String): Builder
+     + withText(textToUse: String): Builder
+     + withGenre(genreToUse: String): Builder
+     + build(): SubmitBookForPublishingRequest
+}
+class GetBookResponse {
+- book: Book
+- recommendations : List<BookRecommendation>
++ GetBookResponse(book: Book, recommendations : List<BookRecommendation>)
++ getBook() : Book
++ setBook(book : Book) : void
++ getRecommendations() : List<BookRecommendation>
++ setRecommendations(recommendations : List<BookRecommendation>) : void
++ equals(o: Object): boolean
++ hashCode(): int
+class GetBookResponse.Builder
+    - book: Book
+    - recommendations : List<BookRecommendation>
+    + withBook(book : Book) : Builder
+    + withRecommendations(recommendations : List<BookRecommendation>) : Builder
+    + build() : GetBookResponse
+
+}
+
+GetBookActivity --|> RecommendationsServiceClient
+GetBookActivity --|> CatalogDao
+GetBookActivity --|> GetBookRequest
+GetBookActivity --|> GetBookResponse
+GetBookActivity --|> CatalogItemConverter
+GetBookActivity --|> RecommendationsCoralConverter
+GetBookActivity --|> CatalogItemVersion
+GetBookActivity --|> BookRecommendation
+GetBookActivity --|> BookGenre
+GetBookRequest --|> GetBookRequest.Builder
+GetPublishingStatusRequest --|> GetPublishingStatusRequest.Builder
+RemoveBookFromCatalogRequest --|> RemoveBookFromCatalogRequest.Builder
+SubmitBookForPublishingRequest --|> SubmitBookForPublishingRequest.Builder
+GetBookResponse --|> GetBookResponse.Builder
+@enduml
