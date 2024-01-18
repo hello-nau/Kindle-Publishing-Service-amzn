@@ -5,6 +5,7 @@ import com.amazon.ata.kindlepublishingservice.exceptions.BookNotFoundException;
 import com.amazon.ata.kindlepublishingservice.publishing.KindleFormattedBook;
 import com.amazon.ata.kindlepublishingservice.utils.KindlePublishingUtils;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import org.apache.commons.lang3.StringUtils;
@@ -57,5 +58,17 @@ public class CatalogDao {
             return null;
         }
         return results.get(0);
+    }
+
+    public CatalogItemVersion removeBookFromCatalog(String bookId) {
+        if(bookId.isEmpty()) throw new BookNotFoundException("The book id can not be empty");
+
+        CatalogItemVersion itemVersion = getLatestVersionOfBook(bookId);
+        if (itemVersion == null || itemVersion.isInactive()) {
+            throw new BookNotFoundException(String.format("Book with the %s id is not found!", bookId));
+        }
+        itemVersion.setInactive(true);
+        dynamoDbMapper.save(itemVersion);
+        return itemVersion;
     }
 }
