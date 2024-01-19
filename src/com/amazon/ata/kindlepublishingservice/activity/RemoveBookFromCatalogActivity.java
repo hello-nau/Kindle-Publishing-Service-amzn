@@ -11,7 +11,9 @@ import javax.inject.Inject;
 public class RemoveBookFromCatalogActivity {
     private CatalogDao catalogDao;
     @Inject
-    RemoveBookFromCatalogActivity() {}
+    RemoveBookFromCatalogActivity(CatalogDao catalogDao) {
+        this.catalogDao = catalogDao;
+    }
     public RemoveBookFromCatalogResponse execute(RemoveBookFromCatalogRequest removeBookFromCatalogRequest) {
         String bookId = removeBookFromCatalogRequest.getBookId();
         CatalogItemVersion removedBook = catalogDao.removeBookFromCatalog(bookId);

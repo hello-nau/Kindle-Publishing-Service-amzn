@@ -36,6 +36,7 @@ public class MasteryTaskOneTests extends IntegrationTestBase {
         catalogItemVersion.setText("text");
         catalogItemVersion.setTitle("title");
         catalogItemVersion.setInactive(false);
+
         super.getTestDao().save(catalogItemVersion);
 
         RemoveBookFromCatalogRequest removeBookFromCatalogRequest = new RemoveBookFromCatalogRequest();
