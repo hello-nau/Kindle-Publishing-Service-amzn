@@ -34,7 +34,8 @@ public class RemoveBookFromCatalogResponse {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof RemoveBookFromCatalogResponse that)) return false;
+        if (!(o instanceof RemoveBookFromCatalogResponse)) return false;
+        RemoveBookFromCatalogResponse that = (RemoveBookFromCatalogResponse) o;
         return Objects.equals(book, that.book);
     }
 
