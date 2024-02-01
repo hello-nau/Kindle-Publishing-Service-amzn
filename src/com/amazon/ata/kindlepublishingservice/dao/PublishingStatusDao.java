@@ -95,6 +95,10 @@ public class PublishingStatusDao {
         PaginatedQueryList<PublishingStatusItem> statusItemPaginatedQueryList =
                 dynamoDbMapper.query(PublishingStatusItem.class, publishingStatusItemDynamoDBQueryExpression);
 
+        if(statusItemPaginatedQueryList.isEmpty()) {
+            throw new PublishingStatusNotFoundException("Publishing status for the recordId not found." + publishStatusRecordId);
+        }
+
         return statusItemPaginatedQueryList;
     }
 }

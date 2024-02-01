@@ -48,6 +48,7 @@ public class GetPublishingStatusRequest {
             return this;
         }
 
-        public GetPublishingStatusRequest build() { return new GetPublishingStatusRequest(this); }
+        public GetPublishingStatusRequest build() {
+            return new GetPublishingStatusRequest(this); }
     }
 }
