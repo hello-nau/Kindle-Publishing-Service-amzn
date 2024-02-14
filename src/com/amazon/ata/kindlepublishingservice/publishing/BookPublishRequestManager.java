@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class BookPublishRequestManager {
-    Queue<BookPublishRequest> publishRequests;
+    private Queue<BookPublishRequest> publishRequests;
 
     public BookPublishRequestManager() {
         publishRequests = new LinkedList<>();
@@ -17,5 +17,9 @@ public class BookPublishRequestManager {
             return publishRequests.remove();
         }
         return null;
+    }
+
+    public Queue<BookPublishRequest> getPublishRequests() {
+        return publishRequests;
     }
 }
