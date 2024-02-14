@@ -13,13 +13,8 @@ public class BookPublishRequestManager {
         publishRequests.add(bookPublishRequest);
     }
     public BookPublishRequest getBookPublishRequestToProcess() {
-        if(!publishRequests.isEmpty()) {
-            return publishRequests.remove();
-        }
-        return null;
+        return publishRequests.poll();
     }
 
-    public Queue<BookPublishRequest> getPublishRequests() {
-        return publishRequests;
-    }
+
 }

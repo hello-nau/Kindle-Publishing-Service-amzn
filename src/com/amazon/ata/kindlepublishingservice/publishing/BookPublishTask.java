@@ -7,47 +7,49 @@ import com.amazon.ata.kindlepublishingservice.dynamodb.models.PublishingStatusIt
 import com.amazon.ata.kindlepublishingservice.enums.PublishingRecordStatus;
 import com.amazon.ata.kindlepublishingservice.exceptions.BookNotFoundException;
 
+import javax.inject.Inject;
 import java.util.Queue;
 
 public final class BookPublishTask implements Runnable {
-  //  processes a publish request from the BookPublishRequestManager.
-  //  If the BookPublishRequestManager has no publishing requests the BookPublishTask should return immediately
-  //  without taking action.
-    private final BookPublishRequestManager bookPublishRequestManager;
-    private final PublishingStatusDao publishingStatusDao;
-    private final CatalogDao catalogDao;
 
-    public BookPublishTask(BookPublishRequestManager bookPublishRequestManager, PublishingStatusDao publishingStatusDao, CatalogDao catalogDao) {
-        this.bookPublishRequestManager = bookPublishRequestManager;
-        this.publishingStatusDao = publishingStatusDao;
-        this.catalogDao = catalogDao;
-    }
+  private final BookPublishRequestManager bookPublishRequestManager;
+  private final PublishingStatusDao publishingStatusDao;
+  private final CatalogDao catalogDao;
 
-    public void getBookPublishRequestToProcess() {
-      Queue<BookPublishRequest> publishRequests = bookPublishRequestManager.getPublishRequests();
-      if (!publishRequests.isEmpty()) {
+  @Inject
+  public BookPublishTask(BookPublishRequestManager bookPublishRequestManager, PublishingStatusDao publishingStatusDao,
+                         CatalogDao catalogDao) {
+    this.bookPublishRequestManager = bookPublishRequestManager;
+    this.publishingStatusDao = publishingStatusDao;
+    this.catalogDao = catalogDao;
+  }
 
-        for (BookPublishRequest request : publishRequests) {
-          String recordId = request.getPublishingRecordId();
-          String bookId = request.getBookId();
-          PublishingStatusItem item = publishingStatusDao.setPublishingStatus(recordId,
-                  PublishingRecordStatus.IN_PROGRESS, bookId);
-          KindleFormattedBook formattedBook = KindleFormatConverter.format(request);
-          CatalogItemVersion itemVersion;
-          try {
-           itemVersion =  catalogDao.createOrUpdateBook(formattedBook);
-           item = publishingStatusDao.setPublishingStatus(item.getPublishingRecordId(), PublishingRecordStatus.SUCCESSFUL,
-                   itemVersion.getBookId());
-          } catch (BookNotFoundException e) {
-            item = publishingStatusDao.setPublishingStatus(recordId, PublishingRecordStatus.FAILED, e.getMessage());
-          }
+  @Override
+  public void run() {
+    BookPublishRequest publishRequest = bookPublishRequestManager.getBookPublishRequestToProcess();
 
-        }
+    while (publishRequest == null) {
+      try {
+        Thread.sleep(1000);
+        publishRequest = bookPublishRequestManager.getBookPublishRequestToProcess();
 
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+
+      publishingStatusDao.setPublishingStatus(publishRequest.getPublishingRecordId(),
+              PublishingRecordStatus.IN_PROGRESS, publishRequest.getBookId());
+      KindleFormattedBook formattedBook = KindleFormatConverter.format(publishRequest);
+
+      try {
+        CatalogItemVersion itemVersion = catalogDao.createOrUpdateBook(formattedBook);
+        publishingStatusDao.setPublishingStatus(publishRequest.getPublishingRecordId(), PublishingRecordStatus.SUCCESSFUL,
+                itemVersion.getBookId());
+
+      } catch(BookNotFoundException e) {
+        publishingStatusDao.setPublishingStatus(publishRequest.getPublishingRecordId(), PublishingRecordStatus.FAILED,
+                e.getMessage());
       }
     }
-    @Override
-    public void run() {
-      getBookPublishRequestToProcess();
-    }
+  }
 }
