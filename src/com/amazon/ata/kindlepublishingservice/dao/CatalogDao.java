@@ -82,6 +82,7 @@ public class CatalogDao {
     public CatalogItemVersion createOrUpdateBook(KindleFormattedBook formattedBook) {
         CatalogItemVersion itemVersion;
         String bookId = formattedBook.getBookId();
+
         if(bookId == null) {
             bookId = KindlePublishingUtils.generateBookId();
             itemVersion = new CatalogItemVersion();
@@ -96,6 +97,7 @@ public class CatalogDao {
             itemVersion.setInactive(false);
 
         }
+
         itemVersion.setGenre(formattedBook.getGenre());
         itemVersion.setAuthor(formattedBook.getAuthor());
         itemVersion.setTitle(formattedBook.getTitle());

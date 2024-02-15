@@ -1,5 +1,6 @@
 package com.amazon.ata.kindlepublishingservice.activity;
 
+import com.amazon.ata.kindlepublishingservice.dagger.DataAccessModule;
 import com.amazon.ata.kindlepublishingservice.dynamodb.models.CatalogItemVersion;
 import com.amazon.ata.kindlepublishingservice.models.requests.SubmitBookForPublishingRequest;
 import com.amazon.ata.kindlepublishingservice.models.response.SubmitBookForPublishingResponse;
@@ -11,10 +12,12 @@ import com.amazon.ata.kindlepublishingservice.enums.PublishingRecordStatus;
 import com.amazon.ata.kindlepublishingservice.publishing.BookPublishRequest;
 
 import com.amazon.ata.kindlepublishingservice.publishing.BookPublishRequestManager;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.C;
 
 import javax.inject.Inject;
 import java.util.UUID;
@@ -28,7 +31,9 @@ import java.util.UUID;
 public class SubmitBookForPublishingActivity {
 
     private PublishingStatusDao publishingStatusDao;
+
     private CatalogDao catalogDao;
+    private BookPublishRequestManager bookPublishRequestManager;
 
     /**
      * Instantiates a new SubmitBookForPublishingActivity object.
@@ -36,9 +41,12 @@ public class SubmitBookForPublishingActivity {
      * @param publishingStatusDao PublishingStatusDao to access the publishing status table.
      */
     @Inject
-    public SubmitBookForPublishingActivity(PublishingStatusDao publishingStatusDao, CatalogDao catalogDao) {
+    public SubmitBookForPublishingActivity(PublishingStatusDao publishingStatusDao, CatalogDao catalogDao,
+                                           BookPublishRequestManager bookPublishRequestManager) {
         this.publishingStatusDao = publishingStatusDao;
         this.catalogDao = catalogDao;
+
+        this.bookPublishRequestManager = bookPublishRequestManager;
     }
 
     /**
@@ -54,18 +62,18 @@ public class SubmitBookForPublishingActivity {
 
         final BookPublishRequest bookPublishRequest = BookPublishRequestConverter.toBookPublishRequest(request);
 
-        // TODO: If there is a book ID in the request, validate it exists in our catalog
+
         String bookId = request.getBookId();
+
+
         if(bookId != null) {
+//            CatalogDao catalogDao1 = new CatalogDao(new DataAccessModule().provideDynamoDBMapper());
             catalogDao.validateBookExists(bookId);
         } else {
             request.setBookId(UUID.randomUUID().toString());
         }
-        // TODO: Submit the BookPublishRequest for processing
-        BookPublishRequest convertedRequest = BookPublishRequestConverter.toBookPublishRequest(request);
-
-        BookPublishRequestManager bookPublishRequestManager = new BookPublishRequestManager();
-        bookPublishRequestManager.addBookPublishRequest(convertedRequest);
+//      BookPublishRequestManager bookPublishRequestManager1 = new BookPublishRequestManager();
+        bookPublishRequestManager.addBookPublishRequest(bookPublishRequest);
 
         PublishingStatusItem item =  publishingStatusDao.setPublishingStatus(bookPublishRequest.getPublishingRecordId(),
                 PublishingRecordStatus.QUEUED,
