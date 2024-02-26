@@ -1,12 +1,6 @@
-# Unit 6 Project Design Doc
+# Kindle Publishing Service Design Document
 
-## Background
-
-The Amazon Kindle store provides millions of ebooks to our customers. The process of publishing an
-ebook to the Kindle catalog is currently an extremely manual process, which causes a long wait time
-to add a book to the catalog.
-
-This design document describes the Amazon Kindle Publishing Service, a new, native AWS service
+This design document describes the Amazon Kindle Publishing Service, a native AWS service
 that will provide the ability to publish books to the Kindle catalog, access published Kindle books
 in the catalog, and remove published Kindle books from the catalog.
 
@@ -43,26 +37,6 @@ Amazon Kindle Publishing Client. The Client makes API calls to the Kindle Publis
 with an AWS load balancer. This forwards the requests to ECS, which connects to a persistent data store for catalog
 and publishing information Responses then flow bck to the Kindle Publishing Client.*
 
-## Kindle Publishing Service API Implementation Notes
-
-### General
-
-* We’ve created a starter service package with an implementation of the `GetBook` operation. This
-comes along with a `CatalogDao` that communicates with the `CatalogItemVersions` table, as well as
-a `RecommendationServiceClient` that communicates with the `RecommendationService`.
-* We’ve provided a `PublishingStatusDao` class with some methods that you’ll use to set the
-publishing status of a book publish request. We’ve also provided a DynamoDB model
-`PublishingStatusItem` which is used by `PublishingStatusDao`.
-* Our team has also provided a `KindlePublishingUtils` class that helps with generating `bookIds`,
-`publishingRecordIds`, and a publishing status message. It exposes the below methods:
-    * `String generateBookId()`
-    * `String generatePublishingRecordId()`
-    * `String generatePublishingStatusMessage(PublishingRecordStatus status)`
-* There is one initial custom exceptions created for the Kindle Publishing service that can be
-thrown (as noted below):
-    * `BookNotFoundException`
-
-Below are the endpoints required to provide the MLP business requirements.
 
 ### Kindle Catalog Versioning
 
@@ -248,7 +222,6 @@ Below are the data models for the DynamoDB tables.
 
 ## Class Diagram
 
-<**MT01.MILESTONE 1**>
 
 [Link to class diagram PUML file](src/resources/mastery-task1-kindle-publishing-CD.puml)
 
@@ -261,14 +234,10 @@ Below are the data models for the DynamoDB tables.
 
 ### RemoveBookFromCatalog
 
-<**MT01.MILESTONE 1**>
-
 [Link to sequence diagram PUML file](src/resources/mastery-task1-remove-book-SD.puml)
 
 ### SubmitBookForPublishing
-**Update (03/11/19)**: the two original `setPublishingStatus` methods in the `PublishingStatusDao`
-have been deprecated. If your MT02 is already using these. It is OK. Do not add any additional
-calls to these methods.
+
 
 ![Sequence diagram for submitBook API](src/resources/submitBook.png)
 
@@ -278,25 +247,6 @@ calls to these methods.
 
 ## Asynchronous Book Publishing
 
-When the App starts up, we make a call to start our `BookPublisher`. This schedules a
-`Runnable` to execute repeatedly while the service runs.
-
-We will have this `Runnable` retrieve a book publish request from `BookPublishRequestManager` and
-perform the steps required for publishing a Kindle book into the catalog. For each
-`BookPublishRequest` in the queue, the following steps are performed:
-
-1. Adds an entry to the Publishing Status table with state `IN_PROGRESS`
-2. Performs formatting and conversion of the book
-3. Adds the new book to the `CatalogItemVersion` table
-    1. If this request is updating an existing book:
-        1. The entry in `CatalogItemVersion` will use the same `bookId` but with the
-           version incremented by 1.
-        1. The previously active version of the book will be marked inactive.
-    2. Otherwise, a new `bookId` is generated for the book and the book will be stored in
-        `CatalogItemVersion` as version 1.
-4. Adds an item to the Publishing Status table with state `SUCCESSFUL` if all the processing steps
-    succeed. If an exception is caught while processing, adds an item into the Publishing Status
-    table with state `FAILED` and includes the exception message.
 
 ![Sequence diagram for Asynchronous Book Processing](src/resources/processing.png)
 
